@@ -13,9 +13,21 @@ public class 写文件 {
 
         File file = new File("javacore/src/文件IO/azusa.jpg");
         File file1 = new File("javacore/src/文件IO/azusa1.jpg");
-        try (FileInputStream fileInputStream = new FileInputStream(file);
-             FileOutputStream fileOutputStream = new FileOutputStream(file1)) {
-            writeOutputStreamFromInputStream(fileInputStream, fileOutputStream);
+//        try (FileInputStream fileInputStream = new FileInputStream(file);
+//             FileOutputStream fileOutputStream = new FileOutputStream(file1)) {
+//            writeOutputStreamFromInputStream(fileInputStream, fileOutputStream);
+//        }
+
+        /*
+        缓冲流，是处理流
+        作为节点流的外包装使用
+        可以加快文件读写速度，原因是内部提供了一个缓冲区
+         */
+        try (FileInputStream fis = new FileInputStream(file);
+             FileOutputStream fos = new FileOutputStream(file1);
+             BufferedInputStream bis = new BufferedInputStream(fis);
+             BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+            writeOutputStreamFromInputStream(bis, bos);
         }
     }
 
