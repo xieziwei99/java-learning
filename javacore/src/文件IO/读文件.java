@@ -1,5 +1,6 @@
 package 文件IO;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,10 +18,10 @@ public class 读文件 {
 
     public static String readFileToString(File file) throws IOException {
         StringBuilder ret = new StringBuilder();
-        try (FileReader reader = new FileReader(file)) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             char[] buf = new char[1024];
             int len;
-            while ((len = reader.read(buf)) != -1) {
+            while ((len = br.read(buf)) != -1) {
                 ret.append(buf, 0, len);
             }
         }

@@ -9,7 +9,7 @@ import java.io.*;
 public class 写文件 {
 
     public static void main(String[] args) throws IOException {
-        writeStringToFile("javacore/src/文件IO/hello.txt", "解放军拉萨空间爱多久撒");
+        writeStringToFile("javacore/src/文件IO/hello.txt", "解放军拉萨空间爱多久撒1231231");
 
         File file = new File("javacore/src/文件IO/azusa.jpg");
         File file1 = new File("javacore/src/文件IO/azusa1.jpg");
@@ -34,6 +34,7 @@ public class 写文件 {
     /**
      * 写入文件，若文件存在，则覆盖文件
      * 若 fileName 的路径中包含不存在的文件夹，则先创建文件夹，再写入文件
+     *
      * @param fileName 可以只包含文件名，也可以包含路径
      */
     public static void writeStringToFile(String fileName, String msg) throws IOException {
@@ -47,8 +48,8 @@ public class 写文件 {
                 System.out.println("目录 " + parentFile + " 已存在");
             }
         }
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            fileWriter.write(msg);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            bw.write(msg);
             System.out.println("写入文件成功");
         }
     }
