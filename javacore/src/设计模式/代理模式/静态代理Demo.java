@@ -1,4 +1,4 @@
-package 代理模式;
+package 设计模式.代理模式;
 
 /**
  * @author xieziwei99
