@@ -7,29 +7,54 @@ import java.util.NoSuchElementException;
  * 2021-03-18
  */
 public class HashMap {
-    private final int capacity = 16;
-    private final Node[] elements = new Node[capacity];
+    private int capacity;
+    private final float loadFactory;
+    private Node[] elements;
 
-    @SuppressWarnings("unused")
-    private static int hash(String key) {
-        switch (key) {
-            case "hello": return 1;
-            case "world":
-            case "hash":
-            case "code":
-                return 2;
-            case "java":
-            case "python":
-                return 3;
-            default:
-                return 0;
-        }
+    public HashMap() {
+        this(16);
+    }
+
+    public HashMap(int capacity) {
+        this(capacity, 0.75f);
+    }
+
+    public HashMap(int capacity, float loadFactory) {
+        this.capacity = capacity;
+        this.loadFactory = loadFactory;
+        elements = new Node[capacity];
     }
 
     public void put(String key, int value) {
-        // hashCode 可能返回负值
+        insertToElements(key, value, elements);
+
+        // 检查是否需要扩容
+        int size = 0;
+        for (Node element : elements) {
+            if (element != null) {
+                size++;
+            }
+        }
+        if (size >= capacity * loadFactory) {
+            System.out.println("此时 size 为 " + size + " 开始扩容");
+            // 扩容，重排
+            capacity *= 2;
+            Node[] newElements = new Node[capacity];
+            for (Node element : elements) {
+                if (element != null) {
+                    Node p = element;
+                    while (p != null) {
+                        insertToElements(p.key, p.value, newElements);
+                        p = p.next;
+                    }
+                }
+            }
+            elements = newElements;
+        }
+    }
+
+    private void insertToElements(String key, int value, Node[] elements) {
         int hash = Math.abs(key.hashCode() % capacity);
-//        int hash = hash(key);       // 测试用
         Node newNode = new Node(key, value);
         if (elements[hash] == null) {
             elements[hash] = newNode;
@@ -38,7 +63,7 @@ public class HashMap {
             while (p != null) {
                 if (p.key.equals(key)) {
                     p.value = value;
-                    return;     // 找到了 key 值相同的 Node
+                    return;
                 }
                 p = p.next;
             }
@@ -52,7 +77,6 @@ public class HashMap {
     public int get(String key) {
         // hashCode 可能返回负值
         int hash = Math.abs(key.hashCode() % capacity);
-//        int hash = hash(key);       // 测试用
         if (elements[hash] != null) {
             Node p = elements[hash];
             while (p != null) {
@@ -94,7 +118,16 @@ public class HashMap {
         System.out.println(hashMap.get("hello"));
         System.out.println(hashMap.get("b"));
         System.out.println(hashMap.get("code"));
-        System.out.println(hashMap.get("d"));
+//        System.out.println(hashMap.get("d"));
+
+        for (char c = 'a'; c <= 'z'; c++) {
+            hashMap.put(c + "", 11);
+        }
+        System.out.println(hashMap);
+
+        System.out.println(hashMap.capacity);
+        System.out.println(hashMap.get("hello"));
+        System.out.println(hashMap.get("b"));
     }
 }
 
