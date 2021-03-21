@@ -48,6 +48,14 @@ public class BinaryTree<T> {
     /**
      * 按前序遍历输入序列（数字）生成一棵树
      * 示例输入序列：12　23　$　$　36　78　$　$　89　$　$
+     *         		89
+     *          36
+     *              78
+     *      12
+     *          23
+     *
+     * 如果输入时只输入 $ ，则会返回一个 null，但这并不能代表空树，
+     * 如果调用他的相关方法，则会抛出空指针异常
      */
     public static BinaryTree<Integer> createBinaryTree(Scanner in) {
         BinaryTree<Integer> tree = new BinaryTree<>();
@@ -76,7 +84,7 @@ public class BinaryTree<T> {
      *
      * @param tree 树
      */
-    public static <T> void printTree(BinaryTree<T> tree, int level) {
+    private static <T> void printTree(BinaryTree<T> tree, int level) {
         if (tree != null) {
             printTree(tree.getRight(), level + 1);
             for (int i = 0; i < level; i++) {
@@ -112,6 +120,106 @@ public class BinaryTree<T> {
     }
 
     /**
+     * 后序遍历-递归
+     */
+    public void postorderTraverse(ExecutorWithNoResult executor) {
+        if (this.getValue() != null) {
+            if (this.getLeft() != null) {
+                this.getLeft().postorderTraverse(executor);
+            }
+            if (this.getRight() != null) {
+                this.getRight().postorderTraverse(executor);
+            }
+            executor.execute(this.getValue());
+        }
+    }
+
+    /**
+     * 中序遍历-递归
+     */
+    public void inorderTraverse(ExecutorWithNoResult executor) {
+        if (this.getValue() != null) {
+            if (this.getLeft() != null) {
+                this.getLeft().inorderTraverse(executor);
+            }
+            executor.execute(this.getValue());
+            if (this.getRight() != null) {
+                this.getRight().inorderTraverse(executor);
+            }
+        }
+    }
+
+    /**
+     * 前序遍历-栈
+     */
+    @SuppressWarnings("rawtypes")
+    public void preorderTraverseWithStack(ExecutorWithNoResult executor) {
+        Stack<BinaryTree> stack = new Stack<>(BinaryTree.class);
+        BinaryTree p = this;
+        while (p != null || !stack.isEmpty()) {
+            if (p != null) {
+                executor.execute(p.getValue());
+                stack.push(p);
+                p = p.left;
+            } else {
+                p = stack.peek();
+                stack.pop();
+                p = p.right;
+            }
+        }
+    }
+
+    /**
+     * 中序遍历-栈
+     */
+    @SuppressWarnings("rawtypes")
+    public void inorderTraverseWithStack(ExecutorWithNoResult executor) {
+        Stack<BinaryTree> stack = new Stack<>(BinaryTree.class);
+        BinaryTree p = this;
+        while (p != null || !stack.isEmpty()) {
+            if (p != null) {
+                stack.push(p);
+                p = p.getLeft();
+            } else {
+                p = stack.peek();
+                stack.pop();
+                executor.execute(p.getValue());
+                p = p.getRight();
+            }
+        }
+    }
+
+    /**
+     * 后序遍历-栈
+     */
+    @SuppressWarnings("rawtypes")
+    public void postorderTraverseWithStack(ExecutorWithNoResult executor) {
+        Stack<BinaryTree> stack = new Stack<>(BinaryTree.class);
+        BinaryTree cur = this;
+        BinaryTree pre = null;
+        stack.push(cur);
+
+        boolean canVisit;
+        while (!stack.isEmpty()) {
+            cur = stack.peek();
+            canVisit = (pre != null && (pre == cur.getLeft() || pre == cur.getRight()));
+
+            if ((cur.getLeft() == null && cur.getRight() == null) || canVisit) {
+                executor.execute(cur.getValue());
+                pre = cur;
+                stack.pop();
+            } else {
+                if (cur.getRight() != null) {
+                    stack.push(cur.getRight());
+                }
+                if (cur.getLeft() != null) {
+                    stack.push(cur.getLeft());
+                }
+            }
+        }
+    }
+
+    /**
      * 带有返回值的前序遍历-递归
      */
     @SuppressWarnings("unchecked")
@@ -127,26 +235,129 @@ public class BinaryTree<T> {
         }
     }
 
-    public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        BinaryTree<Integer> tree = BinaryTree.createBinaryTree(in);
-        in.close();
-        BinaryTree.printTree(tree);
+    /**
+     * 递归-得到叶子节点的个数
+     * @return 叶子节点的个数
+     */
+    public int getLeaveNum() {
+        if (this.getLeft() == null && this.getRight() == null) {
+            return 1;
+        }
+        int leftNum = 0, rightNum = 0;
+        if (this.getLeft() != null) {
+            leftNum = this.getLeft().getLeaveNum();
+        }
+        if (this.getRight() != null) {
+            rightNum = this.getRight().getLeaveNum();
+        }
+        return leftNum + rightNum;
+    }
 
+    /**
+     * 递归-交换左右子树
+     */
+    public void swapLeftAndRight() {
+        BinaryTree<T> temp = this.getLeft();
+        this.setLeft(this.getRight());
+        this.setRight(temp);
+        if (this.getLeft() != null) {
+            this.getLeft().swapLeftAndRight();
+        }
+        if (this.getRight() != null) {
+            this.getRight().swapLeftAndRight();
+        }
+    }
+
+    /**
+     * 递归-计算节点个数
+     * @return 节点个数
+     */
+    public int getNodeNum() {
+        int leftNum = 0, rightNum = 0;
+        if (this.getLeft() != null) {
+            leftNum = this.getLeft().getNodeNum();
+        }
+        if (this.getRight() != null) {
+            rightNum = this.getRight().getNodeNum();
+        }
+        return leftNum + rightNum + 1;
+    }
+
+    public int getHeight() {
+        int leftHeight = 0, rightHeight = 0;
+        if (this.getLeft() != null) {
+            leftHeight = this.getLeft().getHeight();
+        }
+        if (this.getRight() != null) {
+            rightHeight = this.getRight().getHeight();
+        }
+        return leftHeight > rightHeight ? leftHeight + 1 : rightHeight + 1;
+    }
+
+    public static void main(String[] args) {
         // 常规的树
         BinaryTree<Integer> tree1 = new BinaryTree<>(12);
         tree1.setLeft(new BinaryTree<>(23));
         tree1.setRight(new BinaryTree<>(36).setLeft(new BinaryTree<Integer>().setValue(78)).setRight(new BinaryTree<>(89)));
+
+        // 输入时测试，一般的树，一般更大点的树
+        /*
+        12　23　$　$　36　78　$　$　89　$　$
+        		89
+            36
+                78
+        12
+            23
+         */
+        /*
+        12 23 45 57 $ $ 67 $ 89 $ $ $ 36 78 56 $ $ $ 89 $ $
+        		89
+            36
+                78
+                    56
+        12
+            23
+                         89
+                    67
+                45
+                    57
+         */
+        Scanner in = new Scanner(System.in);
+        tree1 = BinaryTree.createBinaryTree(in);
+        in.close();
 
         BinaryTree.printTree(tree1);
         tree1.preorderTraverse((ExecutorWithNoResult) System.out::println);
         tree1.preorderTraverse(o -> (int) o + 1);
         BinaryTree.printTree(tree1);
 
-        // 空树
-        BinaryTree<Integer> tree2 = new BinaryTree<>();
-        BinaryTree.printTree(tree2);
-        tree2.preorderTraverse((ExecutorWithNoResult) System.out::println);
+        System.out.println("后序遍历输出");
+        tree1.postorderTraverse(System.out::println);
+
+        System.out.println("中序遍历输出");
+        tree1.inorderTraverse(System.out::println);
+
+        System.out.println("前序遍历输出");
+        tree1.preorderTraverseWithStack(System.out::println);
+
+        System.out.println("中序遍历输出");
+        tree1.inorderTraverseWithStack(System.out::println);
+
+        System.out.println("后序遍历输出");
+        tree1.postorderTraverseWithStack(System.out::println);
+
+        System.out.println("叶子节点个数");
+        System.out.println(tree1.getLeaveNum());
+
+        tree1.swapLeftAndRight();
+        System.out.println("交换左右子树后");
+        BinaryTree.printTree(tree1);
+
+        System.out.println("节点个数");
+        System.out.println(tree1.getNodeNum());
+
+        System.out.println("树的深度");
+        System.out.println(tree1.getHeight());
     }
 }
 
