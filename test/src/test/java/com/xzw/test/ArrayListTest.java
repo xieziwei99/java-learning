@@ -71,6 +71,7 @@ public class ArrayListTest {
         for (int i = 0; i < 5; i++) {
             list.add(i + 1);
         }
+        Assertions.assertThrows(IllegalArgumentException.class, () -> list.get(5));
         Assertions.assertThrows(IllegalArgumentException.class, () -> list.add(6, 10));
         Assertions.assertThrows(IllegalArgumentException.class, () -> list.delete(6));
         Assertions.assertThrows(IllegalArgumentException.class, () -> list.delete(Integer.valueOf(100)));

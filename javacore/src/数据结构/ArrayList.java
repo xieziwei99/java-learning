@@ -47,6 +47,9 @@ public class ArrayList<T> implements List<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T get(int index) {
+        if (index >= size) {
+            throw new IllegalArgumentException("index " + index + " 超出下标");
+        }
         return (T) elements[index];
     }
 
