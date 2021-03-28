@@ -26,6 +26,17 @@ public class ArrayList<T> implements List<T> {
         this.elements = new Object[capacity];
     }
 
+    public ArrayList(ArrayList<T> sample) {
+        if (sample != null) {
+            this.size = sample.size;
+            this.capacity = sample.capacity;
+            this.elements = new Object[capacity];
+            System.arraycopy(sample.elements, 0, this.elements, 0, size);
+        } else {
+            throw new IllegalArgumentException("参数 sample 不应该为空");
+        }
+    }
+
     @Override
     public void add(T t) {
         ensureCapacity(size + 1);

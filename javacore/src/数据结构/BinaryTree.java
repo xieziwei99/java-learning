@@ -294,6 +294,65 @@ public class BinaryTree<T> {
         return leftHeight > rightHeight ? leftHeight + 1 : rightHeight + 1;
     }
 
+    private void checkSum(int sum, int res, boolean[] exists) {
+        if (this.getValue() != null) {
+            res += (Integer) this.getValue();
+            if (this.getLeft() != null) {
+                this.getLeft().checkSum(sum, res, exists);
+            }
+            if (this.getRight() != null) {
+                this.getRight().checkSum(sum, res, exists);
+            }
+            if (this.getLeft() == null && this.getRight() == null) {
+                if (sum == res) {
+                    exists[0] = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * 检查从根节点到所有叶子节点，是否存在一条路径，使得它的权值和等于给定的 sum 值
+     * @param sum 给定的权值和
+     * @return 如果存在，则返回 true
+     */
+    public boolean checkSum(int sum) {
+        boolean[] exists = {false};
+        checkSum(sum, 0, exists);
+        return exists[0];
+    }
+
+    private void acquirePathWithSpecifySum(int sum, int res, List<Integer> tempList, List<Integer> resList) {
+        if (this.getValue() != null) {
+            res += (Integer) this.getValue();
+            tempList.add((Integer) this.getValue());
+            if (this.getLeft() != null) {
+                this.getLeft().acquirePathWithSpecifySum(sum, res, new ArrayList<>((ArrayList<Integer>) tempList), resList);
+            }
+            if (this.getRight() != null) {
+                this.getRight().acquirePathWithSpecifySum(sum, res, new ArrayList<>((ArrayList<Integer>) tempList), resList);
+            }
+            if (this.getLeft() == null && this.getRight() == null) {
+                if (sum == res) {
+                    for (int i = 0; i < tempList.length(); i++) {
+                        resList.add(tempList.get(i));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 检查从根节点到所有叶子节点，是否存在一条路径，使得它的权值和等于给定的 sum 值
+     * @param sum 给定的权值和
+     * @return 如果存在，则返回找到的那条路径（后找到的路径）
+     */
+    public List<Integer> acquirePathWithSpecifySum(int sum) {
+        List<Integer> ret = new ArrayList<>();
+        acquirePathWithSpecifySum(sum, 0, new ArrayList<>(), ret);
+        return ret;
+    }
+
     public static void main(String[] args) {
         // 常规的树
         BinaryTree<Integer> tree1 = new BinaryTree<>(12);
